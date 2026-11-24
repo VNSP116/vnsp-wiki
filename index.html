@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14100a">
+<title>VNSP — вики сервера</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#14100a;--card:#201808;--card2:#2a200c;--ink:#f6ecd0;--mut:#b7a36e;--gold:#f2b61c;--gold2:#ffd84a;--deep:#8a5a00;--line:#3d2e12;--leaf:#74c94f;--bad:#ef6a52}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--bg);color:var(--ink);font:16px/1.55 Onest,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 84px);max-width:640px;margin:0 auto}
+h1,h2,h3{font-family:'Pixelify Sans',monospace,sans-serif;line-height:1.15}
+h2{font-size:28px;margin:4px 0 14px;color:var(--gold2)}
+h3{font-size:20px;margin:24px 0 8px;color:var(--gold)}
+p{margin:0 0 10px}
+.hero{text-align:center;padding:4px 0 8px}
+.plate{background:#fffdf6;border-radius:10px;border:3px solid var(--gold);box-shadow:0 5px 0 var(--deep);padding:8px;width:min(300px,80%);margin:0 auto}
+.plate img{width:100%;height:auto;display:block;border-radius:6px}
+.hero p{color:var(--mut);margin-top:14px}
+.status{border:2px solid var(--gold);border-radius:8px;background:var(--card);box-shadow:4px 4px 0 var(--deep);padding:14px;margin:18px 0}
+.row{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.dot{display:inline-block;width:12px;height:12px;border-radius:2px;background:#777;margin-right:8px}
+.dot.on{background:var(--leaf);box-shadow:0 0 8px var(--leaf)}.dot.off{background:var(--bad)}
+.big{font-family:'Pixelify Sans',monospace;font-size:30px;font-weight:700;color:var(--gold2);margin-top:6px}
+.players{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.players span{background:var(--card2);border:1px solid var(--gold);border-radius:4px;padding:2px 8px;font-size:14px}
+.muted{color:var(--mut);font-size:14px}
+.ip{display:flex;gap:8px;margin-top:12px}
+.ip code{flex:1;background:#0f0c06;border:2px dashed var(--gold);border-radius:6px;padding:10px 12px;font-size:17px;font-weight:600;color:var(--gold2);overflow-wrap:anywhere}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--gold);color:#241800;border:2px solid #000;border-radius:6px;padding:8px 14px;font-weight:600;box-shadow:0 3px 0 var(--deep)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--deep)}
+.list{list-style:none;padding:0}
+.list li{position:relative;padding:10px 12px 10px 36px;background:var(--card);border:1px solid var(--line);border-radius:6px;margin-bottom:8px}
+.list li::before{content:"";position:absolute;left:13px;top:17px;width:10px;height:10px;background:var(--gold);border:2px solid var(--deep)}
+.list.bad li::before{background:var(--bad);border-color:#7d1b12}
+.cmd{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px;cursor:pointer}
+.cmd:active{background:var(--card2)}
+.cmd code{font-weight:600;color:var(--gold2);overflow-wrap:anywhere}
+.cmd small{display:block;color:var(--mut);font-size:14px;margin-top:2px}
+.note{background:var(--card2);border-left:4px solid var(--gold);border-radius:4px;padding:12px 14px;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card);border:2px solid var(--line);border-radius:6px;padding:4px 11px;font-size:15px;font-weight:500}
+.chip.own{background:var(--gold);border-color:#000;color:#241800}
+.chip.season{border-color:var(--leaf);color:var(--leaf)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px}
+.kv b{color:var(--mut);font-weight:500}
+nav{position:fixed;left:0;right:0;bottom:0;background:#0b0804;border-top:2px solid var(--gold);padding:8px 8px calc(env(safe-area-inset-bottom,0px) + 8px);display:flex;gap:6px;justify-content:center;z-index:5}
+nav button{flex:1;max-width:110px;background:transparent;color:var(--mut);border:0;border-radius:6px;padding:8px 2px;font-size:13px;font-weight:500}
+nav button b{display:block;font-size:20px;line-height:1.1}
+nav button[aria-selected=true]{background:var(--gold);color:#241800}
+nav button:focus-visible,.btn:focus-visible,.cmd:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+.tab{display:none}.tab.show{display:block}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--gold);color:#241800;font-weight:600;border-radius:6px;padding:8px 14px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section class="tab show" id="home">
+  <div class="hero">
+    <div class="plate"><img src="https://i.postimg.cc/j2FmBkdW/Picsart-26-11-22-18-24-43-302.jpg" alt="VNSP"></div>
+    <p>Ванильное выживание с плагинами в духе SMP</p>
+  </div>
+  <div class="status">
+    <div class="row"><div><span class="dot" id="dot"></span><b id="st">Проверяем сервер…</b></div><button class="btn" id="refresh" type="button">Обновить</button></div>
+    <div class="big" id="cnt">–</div>
+    <div class="muted" id="ver"></div>
+    <div class="players" id="pl"></div>
+    <div class="ip"><code>VNSP.play.ski</code><button class="btn" type="button" data-copy="VNSP.play.ski">Копировать</button></div>
+  </div>
+  <h3>Предпочитаемые направления игры на сервере</h3>
+  <ul class="list">
+    <li>Основывай поселение и зови в него игроков. Зарегистрировать своё может любой.</li>
+    <li>Хочешь играть один? Пожалуйста. Стань известным строителем и берись за масштабные проекты.</li>
+    <li>Сложная сложность: выживать придётся по-настоящему.</li>
+    <li>Профиль и рейтинг показывают, сколько ты сделал для сервера.</li>
+  </ul>
+  <div class="note">Сервер приватный, вход по вайтлисту. Чтобы попасть, напиши в чат в Telegram или Discord, и тебе пришлют ссылку.</div>
+</section>
+
+<section class="tab" id="rules">
+  <h2>Правила</h2>
+  <ul class="list bad">
+    <li>Не грифь, не воруй и не вреди другим игрокам намеренно.</li>
+    <li>Читы и софт, запрещённые на любом сервере, использовать нельзя.</li>
+    <li>PVP только по согласию. Звать на дуэль и устраивать договорные бои и испытания можно.</li>
+    <li>Сервер закрыт вайтлистом, чтобы незваные гости не могли ему навредить.</li>
+  </ul>
+  <h3>Что за нарушения</h3>
+  <p>За любое нарушение устава можно получить бан. Если игрока забанят за гриферство, админы восстановят пострадавшие постройки.</p>
+</section>
+
+<section class="tab" id="guide">
+  <h2>Гайд</h2>
+  <p class="muted">Нажми на команду, чтобы скопировать её.</p>
+  <h3>Профиль и рейтинг</h3>
+  <div class="cmd" tabindex="0" data-copy="/profile "><code>/profile (player)</code><small>Открыть свой профиль или профиль другого игрока</small></div>
+  <div class="cmd" tabindex="0" data-copy="/top"><code>/top</code><small>Топ игроков по уровню</small></div>
+  <div class="cmd" tabindex="0" data-copy="/pdesk "><code>/pdesk (clear)</code><small>Изменить описание профиля или очистить его</small></div>
+  <h3>Поселения</h3>
+  <p>Каждый игрок может зарегистрировать одно поселение и пригласить в него других.</p>
+  <div class="cmd" tabindex="0" data-copy="/settlement leave"><code>/settlement leave</code><small>Покинуть поселение</small></div>
+  <div class="cmd" tabindex="0" data-copy="/settlement role "><code>/settlement role (player) (роль)</code><small>Назначить игроку должность</small></div>
+  <div class="cmd" tabindex="0" data-copy="/settlement desc "><code>/settlement desc (text)</code><small>Задать описание поселения</small></div>
+  <div class="cmd" tabindex="0" data-copy="/settlement coords"><code>/settlement coords</code><small>Сохранить координаты поселения. Встань на его территории и введи команду</small></div>
+  <div class="cmd" tabindex="0" data-copy="/settlement icon "><code>/settlement icon (#dirt)</code><small>Выбрать иконку: подойдёт любой блок или предмет, указанный по игровому коду</small></div>
+  <div class="cmd" tabindex="0" data-copy="/settlement kick "><code>/settlement kick (player)</code><small>Исключить игрока из поселения</small></div>
+  <h3>Кастомизация игрока</h3>
+  <div class="cmd" tabindex="0" data-copy="/skin set "><code>/skin set (player)</code><small>Поставить скин любого игрока</small></div>
+  <div class="cmd" tabindex="0" data-copy="/prefix "><code>/prefix (слово)</code><small>Добавить приписку к нику. Для цвета используй код, например &amp;1Слово. Эмодзи из игры тоже работают</small></div>
+  <h3>Голосовой чат</h3>
+  <p>На сервере есть голосовой чат. Чтобы им пользоваться, установи мод SimpleVoiceChat.</p>
+  <h3>AntiXRay</h3>
+  <div class="note">На сервере работает AntiXRay. Он скрывает руды под землёй, поэтому X-Ray и подобные текстур-паки здесь бесполезны.</div>
+</section>
+
+<section class="tab" id="plugins">
+  <h2>Плагины</h2>
+  <h3>Созданные для сервера</h3>
+  <div class="chips">
+    <span class="chip own">PlayerPrefix</span><span class="chip own">ProfileLevels</span><span class="chip own">ServerLogoTab</span><span class="chip own">EndLock</span><span class="chip own">Settlements</span>
+  </div>
+  <h3>Сезонный</h3>
+  <div class="chips"><span class="chip season">WinterSeason</span></div>
+  <p class="muted" style="margin-top:8px">Действует с 01.12.26 по 31.01.27. Дата окончания может измениться.</p>
+  <h3>Общедоступные</h3>
+  <div class="chips">
+    <span class="chip">AuthMe</span><span class="chip">Chunky</span><span class="chip">CoreProtect</span><span class="chip">GSit</span><span class="chip">SkinsRestorer</span><span class="chip">ViaVersion</span><span class="chip">ViaBackWards</span><span class="chip">VoiceChat</span><span class="chip">Maintenance</span><span class="chip">Spark</span><span class="chip">FreedomChat</span><span class="chip">SquareMap</span>
+  </div>
+</section>
+
+<section class="tab" id="info">
+  <h2>Информация</h2>
+  <div class="kv">
+    <b>IP</b><span>VNSP.play.ski</span>
+    <b>Ядро</b><span>Paper 1.21.11</span>
+    <b>Версии</b><span>Java, с 1.8.9 по 26.3</span>
+    <b>Bedrock</b><span>Поддержки не будет</span>
+    <b>Создан</b><span>10.08.26</span>
+    <b>Первый мир</b><span>10.08.26 – 27.11.26, затем вайп</span>
+    <b>Второй мир</b><span>с 28.11.26</span>
+  </div>
+  <h3>Связь</h3>
+  <p>У сервера есть чаты в Telegram и Discord. Напиши в чат, и тебе пришлют ссылку для вступления.</p>
+  <p>Если сервер часто лагает, попробуй другие IP-адреса: они указаны в Telegram-группе.</p>
+  <div class="note"><b>Приглашай друзей на VNSP!</b></div>
+  <p class="muted">Эта страница обновляется вместе с сервером, а свежие новости ищи в Telegram.</p>
+</section>
+
+<nav role="tablist" aria-label="Разделы">
+  <button role="tab" aria-selected="true" data-t="home"><b>⌂</b>Главная</button>
+  <button role="tab" aria-selected="false" data-t="rules"><b>⚖</b>Правила</button>
+  <button role="tab" aria-selected="false" data-t="guide"><b>⌘</b>Гайд</button>
+  <button role="tab" aria-selected="false" data-t="plugins"><b>⚙</b>Плагины</button>
+  <button role="tab" aria-selected="false" data-t="info"><b>ⓘ</b>Инфо</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const tg = window.Telegram && Telegram.WebApp;
+if (tg) { try { tg.ready(); tg.expand(); tg.setHeaderColor('#14100a'); tg.setBackgroundColor('#14100a'); tg.setBottomBarColor && tg.setBottomBarColor('#0b0804'); } catch (e) {} }
+const $ = s => document.querySelector(s);
+
+document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('show', t.id === b.dataset.t));
+  scrollTo(0, 0);
+}));
+
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 1400); }
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-copy]'); if (!el) return;
+  const done = () => toast('Скопировано');
+  if (navigator.clipboard) navigator.clipboard.writeText(el.dataset.copy).then(done, done); else done();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.cmd')) e.target.click(); });
+
+async function load() {
+  const dot = $('#dot'), st = $('#st'), cnt = $('#cnt'), ver = $('#ver'), pl = $('#pl');
+  try {
+    const r = await fetch('https://api.mcsrvstat.us/3/VNSP.play.ski');
+    const d = await r.json();
+    pl.innerHTML = '';
+    if (d.online) {
+      dot.className = 'dot on'; st.textContent = 'Сервер онлайн';
+      cnt.textContent = d.players.online + ' / ' + d.players.max + ' игроков';
+      ver.textContent = d.version || '';
+      (d.players.list || []).forEach(p => { const s = document.createElement('span'); s.textContent = p.name; pl.appendChild(s); });
+    } else {
+      dot.className = 'dot off'; st.textContent = 'Сервер офлайн'; cnt.textContent = '–'; ver.textContent = 'Возможно, идут технические работы';
+    }
+  } catch (e) {
+    dot.className = 'dot'; st.textContent = 'Не удалось получить онлайн'; cnt.textContent = '–'; ver.textContent = 'Нажми «Обновить» чуть позже';
+  }
+}
+$('#refresh').addEventListener('click', load);
+load(); setInterval(load, 60000);
+</script>
+</body>
+</html>
