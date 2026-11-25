@@ -51,6 +51,7 @@ button{font:inherit;cursor:pointer}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px}
 .kv b{color:var(--mut);font-weight:500}
 .mapbtn{display:block;text-align:center;text-decoration:none;font-size:17px;padding:12px 14px;margin:0 0 6px}
+.extbtn{margin:10px 0 6px}
 .post{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:10px}
 .post time{display:block;color:var(--mut);font-size:13px}
 .post b{display:block;color:var(--gold2);margin-top:2px}
@@ -136,6 +137,7 @@ body::before{content:"";position:fixed;top:-160px;left:-160px;right:0;bottom:0;z
     <li>Профиль и рейтинг показывают, сколько ты сделал для сервера.</li>
   </ul>
   <h3>Профиль и рейтинг</h3>
+  <p>Система профилей и рейтинга по всей статистике игрока и достижениям на сервере. Она может показать насколько игрок много сделал для этого сервера.</p>
   <div class="cmd" tabindex="0" data-copy="/profile "><code>/profile (player)</code><small>Открыть свой профиль или профиль другого игрока</small></div>
   <div class="cmd" tabindex="0" data-copy="/top"><code>/top</code><small>Топ игроков по уровню</small></div>
   <div class="cmd" tabindex="0" data-copy="/pdesk "><code>/pdesk (clear)</code><small>Изменить описание профиля или очистить его</small></div>
@@ -161,10 +163,13 @@ body::before{content:"";position:fixed;top:-160px;left:-160px;right:0;bottom:0;z
   <div class="cmd" tabindex="0" data-copy="/sel coords set"><code>/sel coords set</code><small>Записать координаты и мир, где ты стоишь. Необязательно</small></div>
   <div class="cmd" tabindex="0" data-copy="/sel coords clear"><code>/sel coords clear</code><small>Убрать координаты</small></div>
   <h3>Кастомизация игрока</h3>
+  <p>Пару команд, которые могут добавить немного кастомизации: поменять возле ника префикс на абсолютно любой, скин можно сменить на тот, который использует лицензионный игрок. (на сайте ниже можно найти нужный скин и ник для команды).</p>
   <div class="cmd" tabindex="0" data-copy="/skin set "><code>/skin set (player)</code><small>Поставить скин любого игрока</small></div>
   <div class="cmd" tabindex="0" data-copy="/prefix "><code>/prefix (слово)</code><small>Добавить приписку к нику. Для цвета используй код, например &amp;1Слово. Эмодзи из игры тоже работают</small></div>
+  <a class="btn mapbtn extbtn" href="https://ru.namemc.com/?s" target="_blank" rel="noopener">Скин Minecraft | NameMC</a>
   <h3>Голосовой чат</h3>
   <p>На сервере есть голосовой чат. Чтобы им пользоваться, установи мод SimpleVoiceChat.</p>
+  <a class="btn mapbtn extbtn" href="https://minecraft-inside.ru/mods/185344-simple-voice-chat.html?ysclid=mww8rhz7cq784612048" target="_blank" rel="noopener">Скачать Simple Voice Chat</a>
   <h3>AntiXRay</h3>
   <div class="note">На сервере работает AntiXRay. Он скрывает руды под землёй, поэтому X-Ray и подобные текстур-паки здесь бесполезны.</div>
 </section>
@@ -236,7 +241,7 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.cmd')) e.target.click(); });
 
 // ---- Telegram: открыть карту через встроенный opener
-document.querySelectorAll('#mapbtn, .soc').forEach(a => a.addEventListener('click', e => {
+document.querySelectorAll('#mapbtn, .soc, .extbtn').forEach(a => a.addEventListener('click', e => {
   if (tg && tg.openLink) { e.preventDefault(); try { tg.openLink(a.href); } catch (_) { window.open(a.href, '_blank'); } }
 }));
 
